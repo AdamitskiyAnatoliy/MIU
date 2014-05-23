@@ -1,0 +1,191 @@
+var platform = Ti.Platform.osname;
+var json = require("json");
+
+var mainWindow = Ti.UI.createWindow({
+	backgroundColor : "#f2f2f2"
+});
+
+var windowWidth = Ti.Platform.displayCaps.platformWidth;
+
+if (platform == "iphone") {
+
+	var mainCta = Ti.UI.createImageView({
+		width : windowWidth,
+		height : 250,
+		top : 20,
+		backgroundImage : "mainCTA.jpg",
+		backgroundColor : "#fff"
+	});
+
+} else {
+
+	var mainCta = Ti.UI.createImageView({
+		width : windowWidth / 2,
+		height : 250,
+		top : 0,
+		backgroundImage : "mainCTAAndroid.jpg",
+		backgroundColor : "#fff"
+	});
+
+}
+
+// Creation of main List View on home page
+
+if (platform == "iphone") {
+	var mainWindowList = Ti.UI.createListView({
+		backgroundColor : "FFFFF0",
+		top : 210,
+		bottom : 0
+	});
+
+	var search = Titanium.UI.createSearchBar({
+		barColor : "#e6e6e6",
+		showCancel : false,
+		height : 40,
+		top : 20,
+	});
+
+	search.addEventListener('cancel', function() {
+		search.blur();
+	});
+
+	mainWindowList.searchView = search;
+	mainWindowList.caseInsensitiveSearch = true;
+
+	var mainList = [];
+	for (i in json.myData) {
+		var listSection = Ti.UI.createListSection({
+		});
+		for (var i = 0, j = json.myData.dogs.length; i < j; i++) {
+
+			var push = mainList.push({
+				properties : {
+					title : json.myData.dogs[i].breed,
+					accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DISCLOSURE,
+					color : 'black',
+					backgroundColor : "#fffff0",
+					height : 70,
+					searchableText : json.myData.dogs[i].breed
+				}
+			});
+		}
+		listSection.setItems(mainList);
+	}
+
+	mainWindowList.sections = [listSection];
+	mainWindow.add(mainWindowList);
+
+} else {
+	var mainWindowList = Ti.UI.createListView({
+		backgroundColor : "black",
+		top : 250
+	});
+	var mainList = [];
+
+	for (var i = 0, j = json.myData.dogs.length; i < j; i++) {
+	var listSection = Ti.UI.createListSection({
+	});
+		var push = mainList.push({
+			properties : {
+				title : json.myData.dogs[i].breed,
+				accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_NONE,
+				color : '#000',
+				height : 70,
+				backgroundColor : "#fffff0"
+			}
+		});
+
+	}
+
+
+
+	listSection.setItems(mainList);
+
+	mainWindowList.sections = [listSection];
+	mainWindow.add(mainWindowList);
+}
+
+//Creation of Quick Facts Page and More Info Page
+
+if (platform == "iphone") {
+
+	mainWindowList.addEventListener("itemclick", function(e) {
+		var quickFactsWindow = Ti.UI.createWindow({
+			backgroundColor : "#fffff0"
+		});
+
+		var navWindow = Ti.UI.iOS.createNavigationWindow({
+
+			window : quickFactsWindow
+
+		});
+
+		var backButton = Ti.UI.createView({
+			top : 30,
+			height : 30,
+			left : 7,
+			width : 60
+		});
+
+		var backButtonText = Ti.UI.createLabel({
+			text : "Back",
+			font : {
+				fontSize : "18dp",
+				fontFamily : "Helvetica"
+			},
+			color : "007aff"
+		});
+
+		var moreInfo = Ti.UI.createView({
+			top : 30,
+			height : 30,
+			right : 7,
+			width : 80
+		});
+
+		var moreInfoText = Ti.UI.createLabel({
+			text : "More info",
+			font : {
+				fontSize : "18dp",
+				fontFamily : "Helvetica"
+			},
+			color : "007aff"
+		});
+
+		backButton.addEventListener("click", function() {
+			navWindow.close();
+		});
+
+		// moreInfo.addEventlistener("click", function(){
+		//
+		// });
+
+		for (var m = 0, n = json.myData.dogs.length; m < n; m++) {
+			var dogPic = Ti.UI.createImageView({
+				width : windowWidth,
+				height : 200,
+				top : 0,
+				image : json.myData.dogs[1].image
+			});
+		}
+		
+		quickFactsWindow.add(dogPic);
+		moreInfo.add(moreInfoText);
+		backButton.add(backButtonText);
+		navWindow.add(backButton, moreInfo);
+		navWindow.open();
+	});
+
+} else {
+
+	mainWindowList.addEventListener("itemclick", function() {
+		var quickFactsWindow = Ti.UI.createWindow({
+			backgroundColor : "#fffff0"
+		});
+		quickFactsWindow.open();
+	});
+
+}
+
+mainWindow.add(mainCta, search);
+mainWindow.open();
